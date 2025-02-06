@@ -1,0 +1,4 @@
+int main(){
+    float var = 5.5;
+    char hola = var;
+}
