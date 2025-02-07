@@ -1,11 +1,12 @@
-# *~
-# #*
-# target
-# .antlr
-# __pycache__
-# compiladores*.java
+*~
+#*
+target
+.antlr
+__pycache__
+compiladores*.java
 # compiladores*.py
-# *.out
-# *.class
-# *.jar
-# *.tokens
+*.out
+*.class
+*.jar
+*.tokens
+.codegpt
