@@ -1,5 +1,7 @@
 from compiladoresVisitor import compiladoresVisitor
 from compiladoresParser import compiladoresParser
+from TablaSimbolos import TablaSimbolos
+
 #Primero tenemos dos clases, Temporal y Etiqueta
 #Temporal genera los t0,t1,etc, incrementando el contador cada vez que solicitamos una nueva
 #Etiqueta genera l0,l1,etc para gestion de control de flujo, para los for,while,etc.
@@ -28,6 +30,7 @@ class Visitor (compiladoresVisitor):
         self.etiquetas = [] #Almacena las etiquetas generadas
         self.generadorDeTemporales = Temporal() #Instancia de la clase Temporal, se encarga de generar los nuevos temporales
         self.generadorDeEtiquetas = Etiqueta()
+        self.tablaDeSimbolos = TablaSimbolos()
 
         self.operando1 = None
         self.operando2 = None
@@ -59,3 +62,41 @@ class Visitor (compiladoresVisitor):
         for i in range(3, ctx.getChildCount(), 2):
             id_actual = ctx.getChild(i).getText()
             self.file.write(f"{id_actual}\n")  
+
+    def visitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
+        # Nombre de la variable de la asignación
+        nombreVariable = ctx.getChild(0).getText()
+        print(f'Asignando a la variable: "{nombreVariable}"\n')
+        
+        # La expresión a la derecha de la asignación
+        expDerecha = ctx.getChild(2)
+        StringConv = expDerecha.getText()
+        print(len(StringConv))
+        # Verificamos si hay más de un child, lo que indicaría que hay una operación
+        if expDerecha.getChildCount() > 1:  # Es una operacion
+            operando1 = self.visit(expDerecha.getChild(0))  # Primer operando
+            operador = expDerecha.getChild(1).getText()  # Operador (+, -, *, /, etc.)
+            operando2 = self.visit(expDerecha.getChild(2))  # Segundo operando
+
+            # Generamos un nuevo temporal para almacenar el resultado de la operación
+            temporal = self.generadorDeTemporales.getTemporal()
+
+            # Realizamos la operación según el operador y generamos el código intermedio
+            if operador == "+":
+                self.file.write(f"{temporal} = {operando1} + {operando2}\n")
+            elif operador == "-":
+                self.file.write(f"{temporal} = {operando1} - {operando2}\n")
+            elif operador == "*":
+                self.file.write(f"{temporal} = {operando1} * {operando2}\n")
+            elif operador == "/":
+                self.file.write(f"{temporal} = {operando1} / {operando2}\n")
+            else:
+                print(f"+++ERROR: Operador '{operador}' no reconocido+++")
+                return
+
+            # Finalmente, asignamos el resultado al temporal
+            self.file.write(f"{nombreVariable} = {temporal}\n")
+        else:
+            # Si no es una operación, simplemente asignamos el valor directo
+            valorDerecha = self.visit(expDerecha)  # Valor directo (puede ser una variable, número, etc.)
+            self.file.write(f"{nombreVariable} = {valorDerecha}\n")
