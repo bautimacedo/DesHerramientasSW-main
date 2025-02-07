@@ -1,5 +1,5 @@
-from .compiladoresVisitor import compiladoresVisitor
-from .compiladoresParser import compiladoresParser
+from compiladoresVisitor import compiladoresVisitor
+from compiladoresParser import compiladoresParser
 #Primero tenemos dos clases, Temporal y Etiqueta
 #Temporal genera los t0,t1,etc, incrementando el contador cada vez que solicitamos una nueva
 #Etiqueta genera l0,l1,etc para gestion de control de flujo, para los for,while,etc.
@@ -53,4 +53,9 @@ class Visitor (compiladoresVisitor):
         print("Se termino de generar el codigo intermedio")
         print("------------------------")
 
-    #def visitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
+    def visitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
+        primer_id = ctx.getChild(1).getText()
+        self.file.write(f"{primer_id}\n")  # Inicializar la variable (opcional)
+        for i in range(3, ctx.getChildCount(), 2):
+            id_actual = ctx.getChild(i).getText()
+            self.file.write(f"{id_actual}\n")  
