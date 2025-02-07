@@ -56,6 +56,18 @@ class Visitor (compiladoresVisitor):
         print("Se termino de generar el codigo intermedio")
         print("------------------------")
 
+
+    def visitInstrucciones(self, ctx: compiladoresParser.InstruccionesContext):
+        for instruccion in ctx.getChildren():
+            self.visit(instruccion)
+        return
+
+    def visitInstruccion(self, ctx: compiladoresParser.InstruccionContext):
+        return self.visitChildren(ctx)
+
+    def visitBloque(self, ctx: compiladoresParser.BloqueContext):
+        return self.visitChildren(ctx)
+    
     def visitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
         primer_id = ctx.getChild(1).getText()
         self.file.write(f"{primer_id}\n")  # Inicializar la variable (opcional)
@@ -70,18 +82,17 @@ class Visitor (compiladoresVisitor):
         
         # La expresión a la derecha de la asignación
         expDerecha = ctx.getChild(2)
-        StringConv = expDerecha.getText()
-        print(len(StringConv))
+        print(expDerecha.getChildCount()) #ESTE ES EL PROBLEMA, SIEMPRE VA A TIRAR COMO QUE ES 1
         # Verificamos si hay más de un child, lo que indicaría que hay una operación
-        if expDerecha.getChildCount() > 1:  # Es una operacion
+        if expDerecha.getChildCount() > 1:  # Es una opal
             operando1 = self.visit(expDerecha.getChild(0))  # Primer operando
             operador = expDerecha.getChild(1).getText()  # Operador (+, -, *, /, etc.)
             operando2 = self.visit(expDerecha.getChild(2))  # Segundo operando
 
-            # Generamos un nuevo temporal para almacenar el resultado de la operación
+            # Generamos el temporal
             temporal = self.generadorDeTemporales.getTemporal()
 
-            # Realizamos la operación según el operador y generamos el código intermedio
+            # Hacemos la operacion y escribimos el codigo intermedio
             if operador == "+":
                 self.file.write(f"{temporal} = {operando1} + {operando2}\n")
             elif operador == "-":
@@ -100,3 +111,4 @@ class Visitor (compiladoresVisitor):
             # Si no es una operación, simplemente asignamos el valor directo
             valorDerecha = self.visit(expDerecha)  # Valor directo (puede ser una variable, número, etc.)
             self.file.write(f"{nombreVariable} = {valorDerecha}\n")
+
