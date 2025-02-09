@@ -37,7 +37,6 @@ DESPizq: '<<';
 DESPder: '>>'; 
 
 NUMERO : DIGITO+ ;
-//LETRAchar : LETRA ;
 
 INT:'int';
 CHAR:'char';
@@ -188,7 +187,7 @@ t :   MULT factor t  //esto es jerarquico, las multiplicaciones e hacen antes y 
 factor : NUMERO  //parentesis es factor
       | ID
       | PA exp PC
-      | LETRA+
+      // | LETRA+
       ;
 
 //iwhile : WHILE PA ID PC instruccion ;//llave es instruccion compuesta, despues del while una instruccion
